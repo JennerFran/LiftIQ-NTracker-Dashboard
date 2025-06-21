@@ -50,27 +50,30 @@ elif view == "7D Mov Avg Calories":
 
 elif view == "Deficit":
     fig = px.line(df, x='Date', y='Deficit',
-                  title='Daily Caloric Deficit')
+                  title='Daily Calorie Deficit')
     st.plotly_chart(fig, use_container_width=True)
 
 elif view == "7D Mov Avg Deficit":
     fig = px.line(df, x='Date', y='Deficit_Mean_7d',
-                  title='Daily Caloric Deficit 7 Days Moving Average')
+                  title='Daily Calorie Deficit 7 Days Moving Average')
     st.plotly_chart(fig, use_container_width=True)
 
 elif view == "Protein":
     fig = px.line(df, x='Date', y=['Protein', 'Rec Prot'],
-                  title='Daily Protein')
+                  title='Daily Protein',
+                  labels={'value': 'Grams'})
     st.plotly_chart(fig, use_container_width=True)
 
 elif view == "Carbohydrates":
     fig = px.line(df, x='Date', y='Carbs',
-                  title='Daily Carbohydrates')
+                  title='Daily Carbohydrates',
+                  labels={'Carbs': 'Grams'})
     st.plotly_chart(fig, use_container_width=True)
 
 elif view == "Fat":
     fig = px.line(df, x='Date', y='Fat',
-                  title='Daily Fat')
+                  title='Daily Fat',
+                  labels={'Fat': 'Grams', 'Date': 'Date'})
     st.plotly_chart(fig, use_container_width=True)
 
 
