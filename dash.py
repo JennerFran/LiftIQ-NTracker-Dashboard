@@ -28,52 +28,73 @@ df['Deficit'] = pd.to_numeric(df['Deficit'], errors='coerce')
 # Add moving average
 df['Calories_Mean_7d'] = df['Kcal'].rolling(window=7).mean()
 df['Deficit_Mean_7d'] = df['Deficit'].rolling(window=7).mean()
+df['Protein_Mean_7d'] = df['Protein'].rolling(window=7).mean()
+df['Carbs_Mean_7d'] = df['Carbs'].rolling(window=7).mean()
+df['Fat_Mean_7d'] = df['Fat'].rolling(window=7).mean()
+df['Cals_Protein'] = 4 * df['Protein']
+df['Cals_Carbs'] = 4 * df['Carbs']
+df['Cals_Fat'] = 9 * df['Fat']
+df['Total_Cals'] = df['Cals_Protein'] + df['Cals_Carbs'] + df['Cals_Fat']
+df['Pct_Cals_Protein'] = 100 * df['Cals_Protein']/df['Total_Cals']
+df['Pct_Cals_Carbs'] = 100 * df['Cals_Carbs']/df['Total_Cals']
+df['Pct_Cals_Fat'] = 100 * df['Cals_Fat']/df['Total_Cals']
+df['Pct_7dMA_Protein'] = df['Pct_Cals_Protein'].rolling(window=7).mean()
+df['Pct_7dMA_Carbs'] = df['Pct_Cals_Carbs'].rolling(window=7).mean()
+df['Pct_7dMA_Fat'] = df['Pct_Cals_Fat'].rolling(window=7).mean()
 
 # Sidebar options
 st.sidebar.image("logo.png", width=150)
 st.sidebar.markdown("## Navigation")
-view = st.sidebar.radio("Choose Plot:", ["Calorie Plot", "7D Mov Avg Calories", "Deficit", "7D Mov Avg Deficit","Protein", "Carbohydrates", "Fat"])
+view = st.sidebar.radio("Choose Plot:", ["Calories", "Deficit","Protein", "Carbohydrates", "Fat", "Percentages"])
 
 # Title
 st.title("LiftIQ: Daily Calorie and Macronutrient Tracker")
 st.caption("Built with Python 💻 | Powered by Discipline 💪")
 
 # Show plot
-if view == "Calorie Plot":
-    fig = px.line(df, x='Date', y=['Kcal', 'Maintenance'], title='Daily Calories')
-    st.plotly_chart(fig, use_container_width=True)
-
-elif view == "7D Mov Avg Calories":
-    fig = px.line(df, x='Date', y=['Calories_Mean_7d', 'Maintenance'],
-                  title='Daily Calories 7 Days Moving Average')
+if view == "Calories":
+    fig = px.line(df, x='Date', y=['Kcal', 'Maintenance', 'Calories_Mean_7d'], 
+                  title='Daily Calories')                 
     st.plotly_chart(fig, use_container_width=True)
 
 elif view == "Deficit":
-    fig = px.line(df, x='Date', y='Deficit',
+     fig = px.line(df, x='Date', y=['Deficit', 'Deficit_Mean_7d'],
                   title='Daily Calorie Deficit')
-    st.plotly_chart(fig, use_container_width=True)
-
-elif view == "7D Mov Avg Deficit":
-    fig = px.line(df, x='Date', y='Deficit_Mean_7d',
-                  title='Daily Calorie Deficit 7 Days Moving Average')
-    st.plotly_chart(fig, use_container_width=True)
+     # Add horizontal line at y = 0
+     fig.add_hline(y=0, line_dash="dash", line_color="red", annotation_text="Zero Line", annotation_position="top left")
+     st.plotly_chart(fig, use_container_width=True)
 
 elif view == "Protein":
-    fig = px.line(df, x='Date', y=['Protein', 'Rec Prot'],
+    fig = px.line(df, x='Date', y=['Protein', 'Rec Prot', 'Protein_Mean_7d'],
                   title='Daily Protein',
                   labels={'value': 'Grams'})
     st.plotly_chart(fig, use_container_width=True)
 
 elif view == "Carbohydrates":
-    fig = px.line(df, x='Date', y='Carbs',
+    fig = px.line(df, x='Date', y=['Carbs', 'Carbs_Mean_7d'],
                   title='Daily Carbohydrates',
                   labels={'Carbs': 'Grams'})
     st.plotly_chart(fig, use_container_width=True)
 
 elif view == "Fat":
-    fig = px.line(df, x='Date', y='Fat',
+    fig = px.line(df, x='Date', y=['Fat', 'Fat_Mean_7d'],
                   title='Daily Fat',
                   labels={'Fat': 'Grams', 'Date': 'Date'})
+    st.plotly_chart(fig, use_container_width=True)
+
+elif view == "Percentages":
+    fig = px.line(df, x='Date', y=['Pct_Cals_Protein', 'Pct_7dMA_Protein', 'Pct_Cals_Carbs', 'Pct_7dMA_Carbs', 'Pct_Cals_Fat', 'Pct_7dMA_Fat'],
+                  title='Percentages of calories for each macro',
+                  labels={'value': 'Percent', 'Date': 'Date'})
+    # Líneas de referencia para tus metas de macros
+    fig.add_hline(y=35, line_dash="dot", line_color="blue", 
+                   annotation_text="Protein Goal (35%)", annotation_position="top right")
+
+    fig.add_hline(y=45, line_dash="dot", line_color="red", 
+                   annotation_text="Carbs Goal (45%)", annotation_position="top left")
+
+    fig.add_hline(y=20, line_dash="dot", line_color="green", 
+                   annotation_text="Fat Goals (20%)", annotation_position="bottom left")
     st.plotly_chart(fig, use_container_width=True)
 
 
